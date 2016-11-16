@@ -37,7 +37,7 @@ def login():
     br = "\n"
     gbk = "gbk"
     Userid = '716901010082'
-    password = '1023268613'
+    password = ''
     usertype = '0'
     login_url = 'http://www.onlinesjtu.com/Index.aspx'
     login_data = {'Userid': Userid, 'password': password, 'userType': usertype}
