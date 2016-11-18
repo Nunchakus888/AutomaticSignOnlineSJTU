@@ -4,8 +4,8 @@
 import os
 
 import requests
-import encodings
-import re, json
+import re
+from parseHtml import MyParser
 
 
 def parse_page(myPage, tag):
@@ -17,6 +17,12 @@ def parse_page(myPage, tag):
         reg_str = '<a href="?\'?([^"\'>]*)'
 
     return re.findall(reg_str, myPage, re.S)
+# <td width=30% height=31 align=center bgcolor=#ffffff>
+# bgcolor="#A2B9DD"
+def parse_download_lesson_page(myPage):
+    reg = '<tr bgcolor=#A2B9DD>(.*?)</tr>'
+    re.findall(reg, myPage, re.S)
+    return re.findall(reg, myPage, re.S)
 
 
 def page_save(save_path, filename, content):
@@ -34,8 +40,6 @@ def page_save(save_path, filename, content):
 
 
 def login():
-    br = "\n"
-    gbk = "gbk"
     Userid = '716901010082'
     password = ''
     usertype = '0'
@@ -50,6 +54,8 @@ def login():
     '''login'''
     _session.post(login_url, data=login_data, headers=header_data)
 
+
+def lesson_url_list0():
     # 考勤列表
     _session.get(
         'http://www.onlinesjtu.com/learningspace/learning/enterbridge.asp?UserID=716901010082&Password=0510ee23dbe8ce9d&UserType=0&IsOpen=1')
@@ -57,8 +63,6 @@ def login():
     r = _session.get(kaoqin_url + '/kaoqin_list.asp?studentid=716901010082&omgid=2088&.9807027=.8985102')
     check_work_page = r.content.decode(gbk)
     tr_check_work_page = parse_page(check_work_page, None)
-    global href_list
-    href_list = []
     for td in tr_check_work_page:
         rows = parse_page(td, 'td')
         for item in rows:
@@ -69,23 +73,26 @@ def login():
     page_save("OnlineSJTU", "checkWork", href_list)
 
 
-def query_lesson_details():
+def lesson_url_list0_0():
     for url in href_list:
         print kaoqin_url + url
         r = _session.get(kaoqin_url + url)
         print r
 
+    downloadR = _session.get("http://www.onlinesjtu.com/learningspace/learning/student/downloadlist.asp?term_identify=2016_3&userid=716901010082&courseid=345&username=%D5%C5%BD%C3%BD%C3&.7055475=.533424")
 
-class OnlineSJTU:
-    def __init__(self):
-        global _session
-        global kaoqin_url
-        kaoqin_url = 'http://www.onlinesjtu.com/learningspace/learning/student/'
-        _session = requests.session()
-        page_save("OnlineSJTU", "checkWork", "")
-        login()
-        query_lesson_details()
+    print parse_download_lesson_page(downloadR.content.decode(gbk))
 
 
 if __name__ == '__main__':
-    letUsGo = OnlineSJTU()
+    br = "\n"
+    gbk = "gbk"
+    href_list = []
+    _session = requests.session()
+    kaoqin_url = 'http://www.onlinesjtu.com/learningspace/learning/student/'
+
+    page_save("OnlineSJTU", "checkWork", "")
+    # login()
+    # myParser = MyParser()
+    lesson_url_list0()
+    lesson_url_list0_0()
